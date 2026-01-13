@@ -101,20 +101,15 @@ class SystemManager:
             return False
 
 class DependencyChecker:
-    """Check and install Python dependencies"""
-    
     @staticmethod
     def check_python_version():
-        """Check if Python version is compatible"""
         if sys.version_info < (3, 6):
             print(f"{TermCtrl.BRIGHT_RED}Error: Python 3.6 or higher is required.{TermCtrl.RESET}")
-            print(f"Current version: {sys.version}")
             return False
         return True
     
     @staticmethod
     def install_missing_packages():
-        """Install missing Python packages"""
         packages_to_check = ['colorama', 'pystyle']
         missing_packages = []
         
@@ -125,14 +120,11 @@ class DependencyChecker:
                 missing_packages.append(package)
         
         if missing_packages:
-            print(f"{TermCtrl.BRIGHT_YELLOW}Installing missing packages: {', '.join(missing_packages)}{TermCtrl.RESET}")
             for package in missing_packages:
                 try:
                     subprocess.check_call([sys.executable, '-m', 'pip', 'install', package])
-                    print(f"{TermCtrl.BRIGHT_GREEN}Successfully installed {package}{TermCtrl.RESET}")
                 except subprocess.CalledProcessError:
-                    print(f"{TermCtrl.BRIGHT_RED}Failed to install {package}{TermCtrl.RESET}")
-        
+                    pass
         return True
 
 class MenuManager:
@@ -142,35 +134,22 @@ class MenuManager:
         self.gui_dir = os.path.join(self.base_dir, "src", "client")
         self.kitty_dir = os.path.join(self.base_dir, "Kitty")
         
-        # Check if src directory exists
         self.is_src_available = os.path.isdir(self.src_dir)
-        
-        # Initialize terminal state
         self.term_width, self.term_height = SystemManager.detect_terminal_size()
         
-        # Menu state
         self.exit_requested = False
         self.current_selection = 0
         self.menu_items = [
-            {"id": "howto", "label": "How to Use", "description": "Interactive guide on using Kitty Tools            "},
-            {"id": "info", "label": "Information", "description": "Credits, license, and additional information      "},
-            {"id": "flood", "label": "Kahoot Flooder", "description": "Advanced Kahoot game flooding utility             "},
-            {"id": "answers", "label": "Answer Hack", "description": "Obtain answers for Kahoot quizzes                 "},
-            {"id": "graphical", "label": "GUI", "description": "A graphical user interface for ease of use        "},
+            {"id": "howto", "label": "How to Use", "description": "Interactive guide on using these tools            "},
+            {"id": "flood", "label": "Game Flooder", "description": "Advanced game flooding utility                  "},
+            {"id": "answers", "label": "Answer Hack", "description": "Obtain answers for quizzes                       "},
+            {"id": "graphical", "label": "GUI", "description": "Graphical user interface                         "},
             {"id": "exit", "label": "Exit", "description": "Exit the application                              "}
         ]
     
-    def render_header(self):
-        version_number = "v36.2 Enhanced"        
-        print(f" {TermCtrl.BRIGHT_YELLOW}┌{'─' * (self.term_width - 4)}┐{TermCtrl.RESET}")
-        print(f" {TermCtrl.BRIGHT_YELLOW}│{TermCtrl.RESET} {TermCtrl.BOLD}{TermCtrl.BRIGHT_WHITE}KITTY TOOLS{TermCtrl.RESET} {TermCtrl.DIM}by 0u44{TermCtrl.RESET}{' ' * (self.term_width - 28)}{TermCtrl.DIM}{TermCtrl.RESET}{TermCtrl.BRIGHT_YELLOW}│{TermCtrl.RESET}")
-        print(f" {TermCtrl.BRIGHT_YELLOW}│{TermCtrl.RESET} {TermCtrl.DIM}{version_number}{TermCtrl.RESET}{' ' * (self.term_width - 17 - len(version_number))}{TermCtrl.BRIGHT_YELLOW}            │{TermCtrl.RESET}")
-        print(f" {TermCtrl.BRIGHT_YELLOW}└{'─' * (self.term_width - 4)}┘{TermCtrl.RESET}")
-        print()
-    
     def render_menu(self):
         print(f" {TermCtrl.BRIGHT_CYAN}╭{'─' * (self.term_width - 4)}╮{TermCtrl.RESET}")
-        print(f" {TermCtrl.BRIGHT_CYAN}│{TermCtrl.RESET} {TermCtrl.BOLD}Main Menu{TermCtrl.RESET}{' ' * (self.term_width - 14)}{TermCtrl.BRIGHT_CYAN}│{TermCtrl.RESET}")
+        print(f" {TermCtrl.BRIGHT_CYAN}│{TermCtrl.RESET} {TermCtrl.BOLD}Tools Menu{TermCtrl.RESET}{' ' * (self.term_width - 15)}{TermCtrl.BRIGHT_CYAN}│{TermCtrl.RESET}")
         print(f" {TermCtrl.BRIGHT_CYAN}├{'─' * (self.term_width - 4)}┤{TermCtrl.RESET}")
         
         for idx, item in enumerate(self.menu_items):
@@ -188,80 +167,52 @@ class MenuManager:
             print(f" {TermCtrl.BRIGHT_CYAN}│{TermCtrl.RESET} {selector} {id_text}{label}{spacing}{desc}{' ' * (self.term_width - 50 - len(item['description']))}{TermCtrl.BRIGHT_CYAN}│{TermCtrl.RESET}")
         
         print(f" {TermCtrl.BRIGHT_CYAN}╰{'─' * (self.term_width - 4)}╯{TermCtrl.RESET}")
-        print()
-        print(f" {TermCtrl.DIM}Use number keys to navigate, Enter to select{TermCtrl.RESET}")
+        print(f"\n {TermCtrl.DIM}Use number keys to navigate, Enter to select{TermCtrl.RESET}")
     
     def render_status(self, message=None):
         platform_info = SystemManager.detect_platform()
-        platform_label = f"{platform_info.capitalize()} platform detected"
+        status_text = message if message else "Ready"
         
-        if message:
-            status_text = message
-        else:
-            status_text = "Ready"
-        
-        print()
-        print(f" {TermCtrl.BRIGHT_BLACK}Status: {TermCtrl.RESET}{status_text}")
-        print(f" {TermCtrl.BRIGHT_BLACK}System: {TermCtrl.RESET}{platform_label}")
-        
-        # Check if enhanced version is available
-        if self.is_src_available:
-            print(f" {TermCtrl.BRIGHT_BLACK}Mode:   {TermCtrl.RESET}{TermCtrl.BRIGHT_GREEN}Enhanced Version Available{TermCtrl.RESET}")
-        else:
-            print(f" {TermCtrl.BRIGHT_BLACK}Mode:   {TermCtrl.RESET}{TermCtrl.YELLOW}Standard Version{TermCtrl.RESET}")
+        print(f"\n {TermCtrl.BRIGHT_BLACK}Status: {TermCtrl.RESET}{status_text}")
+        print(f" {TermCtrl.BRIGHT_BLACK}System: {TermCtrl.RESET}{platform_info.capitalize()}")
 
     def get_user_selection(self):
         try:
-            choice = input("\n Make a selection (1-6): ")
+            choice = input("\n Selection (1-5): ")
             if choice.isdigit() and 1 <= int(choice) <= len(self.menu_items):
                 return int(choice) - 1
             return self.current_selection
         except KeyboardInterrupt:
-            return len(self.menu_items) - 1  # Select exit option
+            return len(self.menu_items) - 1
         except:
             return self.current_selection
     
     def check_dependencies_for_action(self, action_id):
-        """Check if dependencies are available for the selected action"""
         if action_id in ["flood", "answers", "graphical"]:
-            # Check Python dependencies
             try:
                 import colorama
                 import pystyle
             except ImportError:
-                print(f"{TermCtrl.BRIGHT_YELLOW}Installing required Python packages...{TermCtrl.RESET}")
                 DependencyChecker.install_missing_packages()
             
-            # For flooder, check Node.js
             if action_id == "flood":
-                node_available = SystemManager.is_dependency_installed("node")
-                npm_available = SystemManager.is_dependency_installed("npm")
-                
-                if not node_available or not npm_available:
-                    print(f"{TermCtrl.BRIGHT_RED}Node.js is required for the Kahoot Flooder.{TermCtrl.RESET}")
-                    print("The setup script will guide you through installation.")
+                if not SystemManager.is_dependency_installed("node"):
+                    print(f"{TermCtrl.BRIGHT_RED}Node.js is required for this feature.{TermCtrl.RESET}")
                     time.sleep(2)
-        
         return True
     
     def execute_selected_action(self, selection):
         action_id = self.menu_items[selection]["id"]
         
-        # Check dependencies before executing
         if not self.check_dependencies_for_action(action_id):
-            input(f"\n{TermCtrl.BRIGHT_YELLOW}Press Enter to return to the main menu...{TermCtrl.RESET}")
+            input(f"\n{TermCtrl.BRIGHT_YELLOW}Press Enter to return...{TermCtrl.RESET}")
             return
         
-        # Prepare to execute selected action
-        print(f"\n {TermCtrl.BRIGHT_BLUE}Launching {self.menu_items[selection]['label']}...{TermCtrl.RESET}")
-        time.sleep(1)
         SystemManager.clear_screen()
         
         try:
             if action_id == "howto":
                 self.execute_howto()
-            elif action_id == "info":
-                self.execute_info()
             elif action_id == "flood":
                 self.execute_flood()
             elif action_id == "answers":
@@ -270,192 +221,71 @@ class MenuManager:
                 self.execute_graphical()
             elif action_id == "exit":
                 self.exit_requested = True
-                print(f"{TermCtrl.BRIGHT_GREEN}Thank you for using KITTY TOOLS{TermCtrl.RESET}")
                 return
                 
-            input(f"\n{TermCtrl.BRIGHT_YELLOW}Press Enter to return to the main menu...{TermCtrl.RESET}")
+            input(f"\n{TermCtrl.BRIGHT_YELLOW}Press Enter to return to menu...{TermCtrl.RESET}")
             
         except KeyboardInterrupt:
-            print(f"\n{TermCtrl.BRIGHT_YELLOW}Operation cancelled by user{TermCtrl.RESET}")
-            input(f"\n{TermCtrl.BRIGHT_YELLOW}Press Enter to return to the main menu...{TermCtrl.RESET}")
+            input(f"\n{TermCtrl.BRIGHT_YELLOW}Press Enter to return to menu...{TermCtrl.RESET}")
         except Exception as e:
-            print(f"\n{TermCtrl.BRIGHT_RED}Error executing {action_id}: {str(e)}{TermCtrl.RESET}")
-            print(f"{TermCtrl.DIM}If this error persists, please report it on GitHub{TermCtrl.RESET}")
-            input(f"\n{TermCtrl.BRIGHT_YELLOW}Press Enter to return to the main menu...{TermCtrl.RESET}")
+            print(f"\n{TermCtrl.BRIGHT_RED}Error: {str(e)}{TermCtrl.RESET}")
+            input(f"\n{TermCtrl.BRIGHT_YELLOW}Press Enter to return to menu...{TermCtrl.RESET}")
     
     def execute_howto(self):
-        print(f"{TermCtrl.BOLD}{TermCtrl.BRIGHT_CYAN}How to Use KITTY TOOLS{TermCtrl.RESET}\n")
-        
-        if self.is_src_available:
-            # Enhanced version
-            print(f"{TermCtrl.BRIGHT_WHITE}KITTY TOOLS is a suite of utilities for Kahoot:{TermCtrl.RESET}\n")
-            print(f"{TermCtrl.BRIGHT_CYAN}1. Information{TermCtrl.RESET}")
-            print(f"   View credits, license information, and contributors to the project.")
-            print(f"{TermCtrl.BRIGHT_CYAN}2. Kahoot Flooder{TermCtrl.RESET}")
-            print(f"   Create multiple automated players in Kahoot games with customizable settings.")
-            print(f"   You can control the bots collectively or let them act autonomously.")
-            print(f"   Note: Requires Node.js installation")
-            print(f"{TermCtrl.BRIGHT_CYAN}3. Answer Hack{TermCtrl.RESET}")
-            print(f"   Retrieve answers for a Kahoot quiz by providing the Quiz ID.")
-            print(f"   Export answers to a file for future reference.")
-            print(f"{TermCtrl.BRIGHT_CYAN}4. GUI{TermCtrl.RESET}")
-            print(f"   Use the graphical user interface for easier interaction.")
-            print(f"   Requires PyQt5 installation.\n")
-            print(f"{TermCtrl.BRIGHT_YELLOW}Note: All features require an active internet connection.{TermCtrl.RESET}")
-            print(f"{TermCtrl.BRIGHT_YELLOW}Troubleshooting: If you encounter SSL errors, the tools will attempt to fix them automatically.{TermCtrl.RESET}")
-        else:
-            # Standard version
-            try:
-                subprocess.run([sys.executable, os.path.join(self.kitty_dir, "htu.py")])
-            except Exception as e:
-                print(f"Error running how-to guide: {e}")
-                print("Please check the Kitty directory for the htu.py file")
-    
-    def execute_info(self):
-        if self.is_src_available:
-            # Enhanced version
-            print(f"{TermCtrl.BOLD}{TermCtrl.BRIGHT_CYAN}KITTY TOOLS Information{TermCtrl.RESET}\n")
-            print(f"{TermCtrl.BRIGHT_WHITE}KITTY TOOLS v36.2 Enhanced{TermCtrl.RESET}")
-            print(f"Developed by: {TermCtrl.BRIGHT_YELLOW}0u44{TermCtrl.RESET}\n")
-            
-            print(f"{TermCtrl.UNDERLINE}Contributors:{TermCtrl.RESET}")
-            print(f"- {TermCtrl.BRIGHT_RED}@Ccode-lang{TermCtrl.RESET} for helping out!")
-            print(f"- {TermCtrl.BRIGHT_RED}@xTobyPlayZ{TermCtrl.RESET} for Flooder!")
-            print(f"- {TermCtrl.BRIGHT_RED}@cheepling{TermCtrl.RESET} for finding bugs!")
-            print(f"- {TermCtrl.BRIGHT_RED}@Zacky2613{TermCtrl.RESET} for helping and fixing issues!")
-            print(f"- {TermCtrl.BRIGHT_RED}@KiraKenjiro{TermCtrl.RESET} for reviewing and making changes! {TermCtrl.BRIGHT_RED}<3{TermCtrl.RESET}\n")
-            
-            print(f"{TermCtrl.UNDERLINE}License:{TermCtrl.RESET}")
-            print(f"This software is provided for educational purposes only.")
-            print(f"Use at your own risk. The authors are not responsible for any misuse.")
-            print(f"Please read the complete license in the repository for more details.\n")
-            
-            print(f"{TermCtrl.UNDERLINE}Recent Fixes:{TermCtrl.RESET}")
-            print(f"- Fixed SSL certificate issues on macOS")
-            print(f"- Fixed HTTP 403 Forbidden errors with better headers")
-            print(f"- Fixed Node.js module loading issues")
-            print(f"- Added automatic dependency installation")
-            print(f"- Improved error handling and user feedback\n")
-            
-            print(f"{TermCtrl.BRIGHT_GREEN}Thank you for using KITTY TOOLS!{TermCtrl.RESET}")
-        else:
-            # Standard version
-            try:
-                subprocess.run([sys.executable, os.path.join(self.kitty_dir, "Info", "main.py")])
-            except Exception as e:
-                print(f"Error running info module: {e}")
-                print("Please check the Kitty/Info directory")
+        print(f"{TermCtrl.BOLD}{TermCtrl.BRIGHT_CYAN}User Guide{TermCtrl.RESET}\n")
+        print(f"1. Flooder: Create multiple automated players in games.")
+        print(f"2. Answer Hack: Retrieve answers using a Quiz ID.")
+        print(f"3. GUI: Launch a visual window for these tools.")
     
     def execute_flood(self):
-        if self.is_src_available:
-            # Enhanced version
-            try:
-                subprocess.run([sys.executable, os.path.join(self.src_dir, "main.py")])
-            except Exception as e:
-                print(f"Error running enhanced flooder: {e}")
-                print("Falling back to standard version...")
-                try:
-                    subprocess.run([sys.executable, os.path.join(self.kitty_dir, "Flood", "main.py")])
-                except Exception as e2:
-                    print(f"Error running standard flooder: {e2}")
-        else:
-            # Standard version
-            try:
-                subprocess.run([sys.executable, os.path.join(self.kitty_dir, "Flood", "main.py")])
-            except Exception as e:
-                print(f"Error running flooder: {e}")
-                print("Please check the Kitty/Flood directory")
+        target = os.path.join(self.src_dir if self.is_src_available else self.kitty_dir, "main.py" if self.is_src_available else "Flood/main.py")
+        try:
+            subprocess.run([sys.executable, target])
+        except Exception as e:
+            print(f"Execution error: {e}")
     
     def execute_answers(self):
-        if self.is_src_available:
-            # Enhanced version
-            try:
-                subprocess.run([sys.executable, os.path.join(self.src_dir, "client.py")])
-            except Exception as e:
-                print(f"Error running enhanced client: {e}")
-                print("Falling back to standard version...")
-                try:
-                    subprocess.run([sys.executable, os.path.join(self.kitty_dir, "client.py")])
-                except Exception as e2:
-                    print(f"Error running standard client: {e2}")
-        else:
-            # Standard version
-            try:
-                subprocess.run([sys.executable, os.path.join(self.kitty_dir, "client.py")])
-            except Exception as e:
-                print(f"Error running client: {e}")
-                print("Please check the Kitty directory")
+        target = os.path.join(self.src_dir if self.is_src_available else self.kitty_dir, "client.py")
+        try:
+            subprocess.run([sys.executable, target])
+        except Exception as e:
+            print(f"Execution error: {e}")
             
     def execute_graphical(self):
         if self.is_src_available:
-            # Enhanced version - try GUI first, fallback to client
             try:
-                # Check if PyQt5 is available
                 import PyQt5
                 subprocess.run([sys.executable, os.path.join(self.gui_dir, "main.py")])
             except ImportError:
-                print(f"{TermCtrl.BRIGHT_YELLOW}PyQt5 not found. Installing...{TermCtrl.RESET}")
-                try:
-                    subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'PyQt5'])
-                    print(f"{TermCtrl.BRIGHT_GREEN}PyQt5 installed successfully. Starting GUI...{TermCtrl.RESET}")
-                    subprocess.run([sys.executable, os.path.join(self.gui_dir, "main.py")])
-                except subprocess.CalledProcessError:
-                    print(f"{TermCtrl.BRIGHT_RED}Failed to install PyQt5. Using console client instead.{TermCtrl.RESET}")
-                    subprocess.run([sys.executable, os.path.join(self.src_dir, "client.py")])
-            except Exception as e:
-                print(f"Error running GUI: {e}")
-                print("Falling back to console client...")
-                subprocess.run([sys.executable, os.path.join(self.src_dir, "client.py")])
+                print(f"PyQt5 not found. Attempting install...")
+                subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'PyQt5'])
+                subprocess.run([sys.executable, os.path.join(self.gui_dir, "main.py")])
         else:
-            # Standard version - just run the client
-            try:
-                subprocess.run([sys.executable, os.path.join(self.kitty_dir, "client.py")])
-            except Exception as e:
-                print(f"Error running client: {e}")
+            self.execute_answers()
     
     def run(self):
         while not self.exit_requested:
             SystemManager.clear_screen()
             self.term_width, self.term_height = SystemManager.detect_terminal_size()
-            
-            self.render_header()
             self.render_menu()
             self.render_status()
-            
             selection = self.get_user_selection()
             if 0 <= selection < len(self.menu_items):
                 self.current_selection = selection
                 self.execute_selected_action(selection)
 
-def check_system_requirements():
-    """Check system requirements and dependencies"""
-    print(f"{TermCtrl.BRIGHT_CYAN}Checking system requirements...{TermCtrl.RESET}")
-    
-    # Check Python version
-    if not DependencyChecker.check_python_version():
-        sys.exit(1)
-    
-    # Install missing Python packages
-    DependencyChecker.install_missing_packages()
-    
-    print(f"{TermCtrl.BRIGHT_GREEN}System requirements check completed.{TermCtrl.RESET}")
-    time.sleep(1)
-
 def main():
     try:
-        # Check system requirements first
-        check_system_requirements()
+        if not DependencyChecker.check_python_version():
+            sys.exit(1)
+        DependencyChecker.install_missing_packages()
         
-        # Ensure necessary directories exist
-        menu_manager = MenuManager()
-        menu_manager.run()
-        
+        manager = MenuManager()
+        manager.run()
     except KeyboardInterrupt:
-        SystemManager.clear_screen()
-        print(f"{TermCtrl.BRIGHT_GREEN}Thank you for using KITTY TOOLS{TermCtrl.RESET}")
+        pass
     except Exception as e:
-        print(f"{TermCtrl.BRIGHT_RED}A critical error occurred: {str(e)}{TermCtrl.RESET}")
-        print(f"{TermCtrl.BRIGHT_YELLOW}Please report this issue on GitHub: https://github.com/0u44/Kitty-Tools/issues{TermCtrl.RESET}")
+        print(f"Error: {e}")
 
 if __name__ == "__main__":
     main()
