@@ -310,16 +310,7 @@ class Kahoot:
 
 def start_kahoot():
     print("NOTICE: This version is under development and sometimes it might bug, please create an issue at 'https://github.com/CPScript/Kitty-tools/issues' and we will try to fix it <3")
-    Write.Print(f"""
-       _______________________
-      || Enter your quiz ID  ||
-      || below! <3           ||
-      |//
-(>﹏<)
---------------------------------------
----- Kitty-Tools | By <> CPScript ----
---------------------------------------
-    \n""", Colors.orange, interval=0.000)
+    
     Write.Print(f"┌─[Enter Kahoot-ID] <> [User-Input]\n", Colors.white, interval=0.000)
     Write.Print(f"└─────► ", Colors.white, interval=0.000); quiz_id = input(pretty)
     try:

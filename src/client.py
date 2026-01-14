@@ -439,21 +439,7 @@ class KahootClientUI:
     def display_intro():
         PlatformManager.clear_screen()
         
-        print("NOTICE: This is an enhanced version of the Kitty-Tools Kahoot client.")
-        
-        Write.Print(f"""
-       _______________________
-      || Enter your quiz ID  ||
-      || below! <3           ||
-      |//
-(>﹏<)
---------------------------------------
----- Kitty-Tools | By <> CPScript ----
----- Enhanced Edition v1.0 ----------
---------------------------------------
-    \n""", Colors.orange, interval=0.000)
-    
-    @staticmethod
+           @staticmethod
     def get_quiz_id():
         while True:
             Write.Print(f"┌─[Enter Kahoot-ID] <> [User-Input]\n", Colors.white, interval=0.000)
